@@ -14,6 +14,7 @@ import javafx.scene.paint.Color
 import javafx.scene.shape.Rectangle
 import javafx.stage.Stage
 import javafx.stage.Window
+import org.geotools.data.FileDataStoreFinder
 import java.io.File
 
 fun main(args: Array<String>) {
@@ -23,9 +24,13 @@ fun main(args: Array<String>) {
 class MainApp : Application() {
 
     lateinit var rootDirectory: File
+    lateinit var shapefiles: List<File>
 
     override fun init() {
         rootDirectory = File("contrib/TM_WORLD_BORDERS_SIMPL")
+        shapefiles = rootDirectory.listFiles { file ->
+            file.name.endsWith(".shp")
+        }.toList()
     }
 
     override fun start(stage: Stage) {
@@ -51,7 +56,6 @@ class MainApp : Application() {
         val listView = ListView<Any>().apply {
             prefWidth = 300.0
         }
-        val shapefiles = rootDirectory.listFiles { file -> file.name.endsWith(".shp") }
         listView.items = observableArrayList(shapefiles.toList())
         listView.setCellFactory {
             createListCell {
@@ -67,6 +71,11 @@ class MainApp : Application() {
     }
 
     private fun buildMapPane(): MapPane {
+        val dataStore = FileDataStoreFinder.getDataStore(shapefiles.first())
+        println(dataStore.featureSource.info.title)
+        println(dataStore.featureSource.bounds)
+        println(dataStore.featureSource.features.size())
+
         return MapPane().apply {
             layers += Group().apply {
                 children += Rectangle(100.0, 100.0, 200.0, 200.0).apply {
