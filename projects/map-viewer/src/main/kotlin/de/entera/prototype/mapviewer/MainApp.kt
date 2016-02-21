@@ -2,11 +2,13 @@ package de.entera.prototype.mapviewer
 
 import javafx.application.Application
 import javafx.geometry.Pos
+import javafx.scene.Group
 import javafx.scene.Scene
-import javafx.scene.control.Label
 import javafx.scene.input.KeyCode
 import javafx.scene.layout.Pane
 import javafx.scene.layout.StackPane
+import javafx.scene.paint.Color
+import javafx.scene.shape.Rectangle
 import javafx.stage.Stage
 import javafx.stage.Window
 
@@ -29,8 +31,14 @@ class MainApp : Application() {
         val stackPane = StackPane().apply {
             alignment = Pos.CENTER
         }
-        stackPane.children.add(Label(javaClass.simpleName))
-        rootPane.children.add(stackPane)
+        stackPane.children += MapPane().apply {
+            layers += Group().apply {
+                children += Rectangle(100.0, 100.0, 200.0, 200.0).apply {
+                    fill = Color.TOMATO
+                }
+            }
+        }
+        rootPane.children += stackPane
     }
 
     private fun registerKeyboardHandlers(scene: Scene) {
