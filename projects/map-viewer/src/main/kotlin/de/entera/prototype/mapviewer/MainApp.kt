@@ -1,5 +1,6 @@
 package de.entera.prototype.mapviewer
 
+import com.vividsolutions.jts.geom.Geometry
 import javafx.application.Application
 import javafx.collections.FXCollections.observableArrayList
 import javafx.scene.Group
@@ -10,10 +11,9 @@ import javafx.scene.input.KeyCode
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.Pane
 import javafx.scene.layout.StackPane
-import javafx.scene.paint.Color
-import javafx.scene.shape.Rectangle
 import javafx.stage.Stage
 import javafx.stage.Window
+import org.geotools.data.FileDataStore
 import org.geotools.data.FileDataStoreFinder
 import java.io.File
 
@@ -52,6 +52,25 @@ class MainApp : Application() {
         borderPane.center = mapPane
     }
 
+    private fun buildLayer(dataStore: FileDataStore): Group {
+        val features = dataStore.featureSource.features.features()
+        val bounds = dataStore.featureSource.bounds
+
+        val layer = Group()
+        val renderer = ShapeRendererImpl()
+
+        features.use {
+            while (features.hasNext()) {
+                val feature = features.next()
+                val geometry = feature.defaultGeometry as Geometry
+                val shape = renderer.geometry(geometry)
+                layer.children += shape
+            }
+        }
+
+        return layer
+    }
+
     private fun buildLayerPane(): ListView<Any> {
         val listView = ListView<Any>().apply {
             prefWidth = 300.0
@@ -72,16 +91,8 @@ class MainApp : Application() {
 
     private fun buildMapPane(): MapPane {
         val dataStore = FileDataStoreFinder.getDataStore(shapefiles.first())
-        println(dataStore.featureSource.info.title)
-        println(dataStore.featureSource.bounds)
-        println(dataStore.featureSource.features.size())
-
         return MapPane().apply {
-            layers += Group().apply {
-                children += Rectangle(100.0, 100.0, 200.0, 200.0).apply {
-                    fill = Color.TOMATO
-                }
-            }
+            layers += buildLayer(dataStore)
         }
     }
 
