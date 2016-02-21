@@ -21,6 +21,9 @@ apply(plugin: "org.jetbrains.dokka")
 //-------------------------------------------------------------------------------------------------
 
 repositories {
+    // repository for geotools.
+    maven { name "osgeo.org"; url "http://download.osgeo.org/webdav/geotools/" }
+
     // maven central hosts most of the dependencies.
     mavenCentral()
 }
@@ -33,6 +36,12 @@ repositories {
 dependencies {
     // kotlin standard library.
     compile "org.jetbrains.kotlin:kotlin-stdlib:${project.ext.kotlinVersion}"
+
+    // geotools library and extensions.
+    compile "org.geotools:gt-main:${project.ext.geotoolsVersion}"
+    compile "org.geotools:gt-data:${project.ext.geotoolsVersion}"
+    compile "org.geotools:gt-shapefile:${project.ext.geotoolsVersion}"
+    compile "org.geotools:gt-geojson:${project.ext.geotoolsVersion}"
 }
 
 // test source dependencies.
