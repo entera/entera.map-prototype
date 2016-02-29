@@ -5,30 +5,35 @@ import javafx.collections.ListChangeListener
 import javafx.collections.ObservableList
 import javafx.geometry.Pos
 import javafx.scene.Group
-import javafx.scene.layout.AnchorPane
 import javafx.scene.layout.Pane
+import javafx.scene.layout.Region
 import javafx.scene.layout.StackPane
 
 class MapPane : Pane() {
 
-    val layers: ObservableList<Group> = observableArrayList()
+    val viewportContainer: ViewportContainer
+    val viewport: Viewport
 
-    val stackPane: StackPane
-    val anchorPane: AnchorPane
+    val eventRegion: EventRegion
+    val layerStack: LayerStack
+
+    val layers: ObservableList<Layer> = observableArrayList()
 
     init {
-        stackPane = StackPane().apply {
+        viewportContainer = ViewportContainer().apply {
             id = "container"
             styleClass += "map-view"
             alignment = Pos.TOP_LEFT
         }
-
-        anchorPane = AnchorPane().apply {
+        viewport = Viewport().apply {
             id = "map"
         }
 
-        stackPane.children += anchorPane
-        children += stackPane
+        eventRegion = EventRegion()
+        layerStack = LayerStack()
+
+        children += viewportContainer
+        viewportContainer.children += viewport
 
         layers.addListener(ListChangeListener { change ->
             updateLayers()
@@ -37,8 +42,15 @@ class MapPane : Pane() {
     }
 
     private fun updateLayers() {
-        anchorPane.children.setAll(layers)
+        viewport.children.setAll(layers)
         layers.forEach { it.isManaged = false }
     }
 
 }
+
+class Viewport : StackPane()
+class ViewportContainer : StackPane()
+
+class EventRegion : Region()
+class LayerStack : StackPane()
+class Layer : Group()

@@ -1,9 +1,8 @@
 package de.entera.prototype.mapviewer
 
-import com.vividsolutions.jts.geom.Geometry
+import java.io.File
 import javafx.application.Application
 import javafx.collections.FXCollections.observableArrayList
-import javafx.scene.Group
 import javafx.scene.Scene
 import javafx.scene.control.ListCell
 import javafx.scene.control.ListView
@@ -13,21 +12,27 @@ import javafx.scene.layout.Pane
 import javafx.scene.layout.StackPane
 import javafx.stage.Stage
 import javafx.stage.Window
+
+import com.vividsolutions.jts.geom.Geometry
 import org.geotools.data.FileDataStore
 import org.geotools.data.FileDataStoreFinder
-import java.io.File
 
 fun main(args: Array<String>) {
     Application.launch(MainApp::class.java)
 }
 
+private fun File.resolveParent(file: File): File? {
+    val parentDirectories = generateSequence(this.absoluteFile, { it.parentFile })
+    return parentDirectories.map { it.resolve(file) }.find { it.isDirectory }
+}
+
 class MainApp : Application() {
 
     lateinit var rootDirectory: File
-    lateinit var shapefiles: List<File>
+    var shapefiles: List<File> = emptyList()
 
     override fun init() {
-        rootDirectory = File("contrib/TM_WORLD_BORDERS_SIMPL")
+        rootDirectory = File("").resolveParent(File("contrib/TM_WORLD_BORDERS_SIMPL"))!!
         shapefiles = rootDirectory.listFiles { file ->
             file.name.endsWith(".shp")
         }.toList()
@@ -50,13 +55,15 @@ class MainApp : Application() {
         borderPane.left = layerPane
         val mapPane = buildMapPane()
         borderPane.center = mapPane
+
+        registerMapPaneInputHandlers(mapPane)
     }
 
-    private fun buildLayer(dataStore: FileDataStore): Group {
+    private fun buildLayer(dataStore: FileDataStore): Layer {
         val features = dataStore.featureSource.features.features()
         val bounds = dataStore.featureSource.bounds
 
-        val layer = Group()
+        val layer = Layer()
         val renderer = ShapeRendererImpl()
 
         features.use {
@@ -75,7 +82,7 @@ class MainApp : Application() {
         val listView = ListView<Any>().apply {
             prefWidth = 300.0
         }
-        listView.items = observableArrayList(shapefiles.toList())
+        listView.items = observableArrayList(shapefiles.map { it.name.toLowerCase() }.toList())
         listView.setCellFactory {
             createListCell {
                 val item = item
@@ -94,6 +101,9 @@ class MainApp : Application() {
         return MapPane().apply {
             layers += buildLayer(dataStore)
         }
+    }
+
+    private fun registerMapPaneInputHandlers(mapPane: MapPane) {
     }
 
     private fun registerKeyboardHandlers(scene: Scene) {

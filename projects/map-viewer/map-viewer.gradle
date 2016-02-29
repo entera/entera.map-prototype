@@ -4,6 +4,9 @@
 
 buildscript {
     repositories {
+        if (project.hasProperty("useMavenLocal")) {
+            mavenLocal()
+        }
         jcenter()
         mavenCentral()
     }
@@ -21,6 +24,11 @@ apply(plugin: "org.jetbrains.dokka")
 //-------------------------------------------------------------------------------------------------
 
 repositories {
+    // use local maven repository.
+    if (project.hasProperty("useMavenLocal")) {
+        mavenLocal()
+    }
+
     // repository for geotools.
     maven { name "osgeo.org"; url "http://download.osgeo.org/webdav/geotools/" }
 
@@ -42,6 +50,9 @@ dependencies {
     compile "org.geotools:gt-data:${project.ext.geotoolsVersion}"
     compile "org.geotools:gt-shapefile:${project.ext.geotoolsVersion}"
     compile "org.geotools:gt-geojson:${project.ext.geotoolsVersion}"
+
+    // reactfx reactive event streams library.
+    compile "org.reactfx:reactfx:2.0-M4"
 }
 
 // test source dependencies.
@@ -51,6 +62,10 @@ dependencies {
 
     // kotlin assert functions.
     testCompile "org.jetbrains.kotlin:kotlin-test:${project.ext.kotlinVersion}"
+
+    // testfx test framework.
+    testCompile "org.testfx:testfx-core:4.0.3-SNAPSHOT"
+
 }
 
 //-------------------------------------------------------------------------------------------------
