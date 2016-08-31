@@ -25,14 +25,15 @@ apply(plugin: "org.jetbrains.dokka")
 
 repositories {
     // use local maven repository.
-    if (project.hasProperty("useMavenLocal")) {
+    if (project.hasProperty("maven.local")) {
         mavenLocal()
     }
 
-    // repository for geotools.
+    // repository for geotools (this must be before other remote repositories).
     maven { name "osgeo.org"; url "http://download.osgeo.org/webdav/geotools/" }
 
-    // maven central hosts most of the dependencies.
+    // central repositories that host most dependencies.
+    jcenter()
     mavenCentral()
 }
 
@@ -52,7 +53,7 @@ dependencies {
     compile "org.geotools:gt-geojson:${project.ext.geotoolsVersion}"
 
     // reactfx reactive event streams library.
-    compile "org.reactfx:reactfx:2.0-M4"
+    compile "org.reactfx:reactfx:2.0-M5"
 }
 
 // test source dependencies.
@@ -64,7 +65,7 @@ dependencies {
     testCompile "org.jetbrains.kotlin:kotlin-test:${project.ext.kotlinVersion}"
 
     // testfx test framework.
-    testCompile "org.testfx:testfx-core:4.0.3-SNAPSHOT"
+    testCompile "org.testfx:testfx-core:4.0.4-alpha"
 
 }
 
