@@ -1,0 +1,66 @@
+//-------------------------------------------------------------------------------------------------
+// PLUGINS.
+//-------------------------------------------------------------------------------------------------
+
+buildscript {
+    repositories {
+        if (project.hasProperty("useMavenLocal")) {
+            mavenLocal()
+        }
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${project.ext.kotlinVersion}"
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:${project.ext.dokkaVersion}"
+    }
+}
+
+apply(plugin: "kotlin")
+apply(plugin: "org.jetbrains.dokka")
+
+//-------------------------------------------------------------------------------------------------
+// REPOSITORIES.
+//-------------------------------------------------------------------------------------------------
+
+repositories {
+    // use local maven repository.
+    if (project.hasProperty("maven.local")) {
+        mavenLocal()
+    }
+
+    // central repositories that host most dependencies.
+    jcenter()
+}
+
+//-------------------------------------------------------------------------------------------------
+// DEPENDENCIES.
+//-------------------------------------------------------------------------------------------------
+
+// main source dependencies.
+dependencies {
+    // kotlin standard library.
+    compile "org.jetbrains.kotlin:kotlin-stdlib:${project.ext.kotlinVersion}"
+}
+
+// test source dependencies.
+dependencies {
+    // junit test framework.
+    testCompile "junit:junit:4.12"
+
+    // kotlin assert functions.
+    testCompile "org.jetbrains.kotlin:kotlin-test:${project.ext.kotlinVersion}"
+
+    // testfx test framework.
+    testCompile "org.testfx:testfx-core:4.0.4-alpha"
+
+}
+
+//-------------------------------------------------------------------------------------------------
+// CONFIGURATION.
+//-------------------------------------------------------------------------------------------------
+
+dokka {
+    outputFormat = "javadoc"
+}
+
